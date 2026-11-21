@@ -9,10 +9,9 @@ is based on ay8910.cpp, copyright Couriersud. These device sources are
 BSD-3-Clause; see third_party/MAME-BSD.txt. Cartridge metadata is from
 MAME hash/gamate.xml (CC0-1.0).
 
-m6502.h is by Andre Weissflog, zlib license, included in the header.
+The NMOS 6502 operation lists, arithmetic and resampling algorithm
+are adapted from MAME, copyright Olivier Galibert (BSD-3-Clause).
 libretro.h retains the libretro project's MIT notice. Platform make rules
 are adapted from libretro/Potator, The Unlicense (see its LICENSE).
 The Pico palette file format and default RGB values are interoperable
 with pico-gamate. No Pico firmware, BIOS or game data is distributed.
-
-

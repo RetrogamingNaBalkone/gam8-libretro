@@ -1,0 +1,2 @@
+SOURCES_C := src/core.c src/machine.c src/psg.c
+INCFLAGS := -Ithird_party

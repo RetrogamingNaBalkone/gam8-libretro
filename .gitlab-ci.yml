@@ -1,0 +1,168 @@
+stages: [build-prepare, build-shared, build-static]
+
+variables:
+  CORENAME: gamate
+  MAKEFILE_PATH: .
+  JNI_PATH: .
+
+include:
+  - project: libretro-infrastructure/ci-templates
+    ref: 2221b6f4c39340a70a9d2b677719167e0f6e62e8
+    file:
+      - /android-jni.yml
+      - /ctr-legacy-static.yml
+      - /ctr-static.yml
+      - /dingux-arm32.yml
+      - /dingux-mips32.yml
+      - /djgpp-static.yml
+      - /emscripten-static.yml
+      - /ios-arm64.yml
+      - /ios9.yml
+      - /libnx-static.yml
+      - /libounce-static.yml
+      - /linux-aarch64.yml
+      - /linux-i686.yml
+      - /linux-x64.yml
+      - /ngc-static.yml
+      - /orbis-static.yml
+      - /osx-arm64.yml
+      - /osx-ppc.yml
+      - /osx-x64.yml
+      - /ps2-static.yml
+      - /psl1ght-static.yml
+      - /psp-static.yml
+      - /tvos-arm64.yml
+      - /vita-static.yml
+      - /webos-make.yml
+      - /wii-static.yml
+      - /wiiu-static.yml
+      - /windows-i686-mingw.yml
+      - /windows-i686-msvc05-msys2.yml
+      - /windows-i686-msvc10-msys2.yml
+      - /windows-i686-msvc19-msys2.yml
+      - /windows-x64-mingw.yml
+      - /windows-x64-msvc10-msys2.yml
+      - /windows-x64-msvc19-msys2.yml
+
+android-jni-armeabi-v7a:
+  extends: .libretro-android-jni-armeabi-v7a
+
+android-jni-arm64-v8a:
+  extends: .libretro-android-jni-arm64-v8a
+
+android-jni-x86:
+  extends: .libretro-android-jni-x86
+
+android-jni-x86_64:
+  extends: .libretro-android-jni-x86_64
+
+ctr-legacy-static-retroarch-master:
+  extends: .libretro-ctr-legacy-static-retroarch-master
+
+ctr-static-retroarch-master:
+  extends: .libretro-ctr-static-retroarch-master
+
+miyoo-arm32-make-default:
+  extends: .libretro-miyoo-arm32-make-default
+
+dingux-mips32-make-default:
+  extends: .libretro-dingux-mips32-make-default
+
+dingux-odbeta-mips32-make-default:
+  extends: .libretro-dingux-odbeta-mips32-make-default
+
+rs90-odbeta-mips32-make-default:
+  extends: .libretro-rs90-odbeta-mips32-make-default
+
+retrofw-mips32-make-default:
+  extends: .libretro-retrofw-mips32-make-default
+
+djgpp-static-retroarch-master:
+  extends: .libretro-djgpp-static-retroarch-master
+
+emscripten-static-retroarch-master:
+  extends: .libretro-emscripten-static-retroarch-master
+
+ios-arm64-make-default:
+  extends: .libretro-ios-arm64-make-default
+
+ios9-make-default:
+  extends: .libretro-ios9-make-default
+
+libnx-static-retroarch-master:
+  extends: .libretro-libnx-static-retroarch-master
+
+libounce-static-retroarch-master:
+  extends: .libretro-libounce-static-retroarch-master
+
+linux-aarch64-make-default:
+  extends: .libretro-linux-aarch64-make-default
+
+linux-i686-make-default:
+  extends: .libretro-linux-i686-make-default
+
+linux-x64-make-default:
+  extends: .libretro-linux-x64-make-default
+
+ngc-static-retroarch-master:
+  extends: .libretro-ngc-static-retroarch-master
+
+orbis-static-retroarch-master:
+  extends: .libretro-orbis-static-retroarch-master
+
+osx-arm64-make-default:
+  extends: .libretro-osx-arm64-make-default
+
+osx-ppc-make-default:
+  extends: .libretro-osx-ppc-make-default
+
+osx-x64-make-default:
+  extends: .libretro-osx-x64-make-default
+
+ps2-static-retroarch-master:
+  extends: .libretro-ps2-static-retroarch-master
+
+psl1ght-static-retroarch-master:
+  extends: .libretro-psl1ght-static-retroarch-master
+
+psp-static-retroarch-master:
+  extends: .libretro-psp-static-retroarch-master
+
+tvos-arm64-make-default:
+  extends: .libretro-tvos-arm64-make-default
+
+vita-static-retroarch-master:
+  extends: .libretro-vita-static-retroarch-master
+
+webos-armv7a-make-default:
+  extends: .libretro-webos-armv7a-make-default
+
+webos-aarch64-make-default:
+  extends: .libretro-webos-aarch64-make-default
+
+wii-static-retroarch-master:
+  extends: .libretro-wii-static-retroarch-master
+
+wiiu-static-retroarch-master:
+  extends: .libretro-wiiu-static-retroarch-master
+
+windows-i686-mingw-make-default:
+  extends: .libretro-windows-i686-mingw-make-default
+
+windows-i686-msvc05-msys2-make-default:
+  extends: .libretro-windows-i686-msvc05-msys2-make-default
+
+windows-i686-msvc10-msys2-make-default:
+  extends: .libretro-windows-i686-msvc10-msys2-make-default
+
+windows-i686-msvc19-msys2-make-default:
+  extends: .libretro-windows-i686-msvc19-msys2-make-default
+
+windows-x64-mingw-make-default:
+  extends: .libretro-windows-x64-mingw-make-default
+
+windows-x64-msvc10-msys2-make-default:
+  extends: .libretro-windows-x64-msvc10-msys2-make-default
+
+windows-x64-msvc19-msys2-make-default:
+  extends: .libretro-windows-x64-msvc19-msys2-make-default

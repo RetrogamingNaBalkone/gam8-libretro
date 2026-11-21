@@ -1,4 +1,5 @@
-Copyright <YEAR> <COPYRIGHT HOLDER>
+Copyright David Haywood, Peter Wilhelmsen, Kevtris, Olivier Galibert and Couriersud.
+See NOTICE for attribution by component.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are

@@ -12,3 +12,8 @@ build*/
 *.exp
 *.exe
 __pycache__/
+libs/
+obj/
+*.bc
+*.o
+*.pdb
