@@ -1,0 +1,18 @@
+The project is licensed under GPL-2.0-or-later (see LICENSE).
+Upstream revisions are recorded in docs/revisions.txt.
+
+The Gamate machine adapts MAME's gamate.cpp, copyright Peter Trauner
+(GPL-2.0-or-later). The LCD adapts gamate_v.cpp, copyright David Haywood,
+Peter Wilhelmsen and Kevtris. Cartridge and protection logic are based on
+rom.cpp and gamate_protection.cpp, copyright David Haywood. AY synthesis
+is based on ay8910.cpp, copyright Couriersud. These device sources are
+BSD-3-Clause; see third_party/MAME-BSD.txt. Cartridge metadata is from
+MAME hash/gamate.xml (CC0-1.0).
+
+m6502.h is by Andre Weissflog, zlib license, included in the header.
+libretro.h retains the libretro project's MIT notice. Platform make rules
+are adapted from libretro/Potator, The Unlicense (see its LICENSE).
+The Pico palette file format and default RGB values are interoperable
+with pico-gamate. No Pico firmware, BIOS or game data is distributed.
+
+

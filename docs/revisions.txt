@@ -1,0 +1,7 @@
+ra libretro/RetroArch f606c4130390ba4aa44576dd1358c08f21cf37e3
+potator libretro/potator 227c5f6f3ce74d32e9002ce24c1420288559a860
+chips floooh/chips 7ef8776f637a6424ac615da64de6b968b06de791
+mame mamedev/mame ce8812e6a1dcafc97fbafc6d48b0c8184984845f
+xrip xrip/gamate 1645e11715a91592cc126c483b273903411b28fe
+pico DnCraptor/pico-gamate fae8b3342c0999e37d0d3a20384a4f57adbf923d
+common libretro/libretro-common 52781c4a8b5aae19d858f4a2326c8f8308c70f54
