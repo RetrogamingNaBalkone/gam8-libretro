@@ -4,7 +4,7 @@ A standalone software-rendered Bit Corporation Gamate emulator for RetroArch. Th
 
 ## Start a game
 
-1. Copy the library for your platform into RetroArch's **Cores** directory and `gam8_libretro.info` into its **Core Info** directory. Alternatively, use **Load Core → Install or Restore a Core**.
+1. Copy the library for your platform into RetroArch's **Cores** directory and [`gam8_libretro.info`](info/gam8_libretro.info) into its **Core Info** directory. Alternatively, use **Load Core → Install or Restore a Core**.
 2. Extract at least one of the following 4096-byte BIOS files into RetroArch's **System/BIOS** directory. Rename the extracted file as shown.
 3. Select **Load Core → Bit Corporation - Gamate (Gam8)**, then **Load Content** and select a cartridge `.bin` or its single-game ZIP. RetroArch handles archive extraction. Supported ROM sizes are 16, 32, 64, 128, 256 and 512 KiB.
 

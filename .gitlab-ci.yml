@@ -62,6 +62,7 @@ device-and-presentation-tests:
   artifacts:
     paths:
       - ${CORENAME}_libretro*
+      - info/gam8_libretro.info
       - LICENSE
       - NOTICE
       - third_party/MAME-BSD.txt
@@ -69,7 +70,6 @@ device-and-presentation-tests:
       - "*.a"
       - "*.bc"
       - "*.exp"
-      - "*.info"
       - "*.lib"
       - "*.pdb"
 
