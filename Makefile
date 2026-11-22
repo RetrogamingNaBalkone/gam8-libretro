@@ -38,10 +38,11 @@ endif
 
 prefix := /usr
 libdir := $(prefix)/lib
+licensedir ?= $(prefix)/share/licenses/gam8
 
 LIBRETRO_INSTALL_DIR := libretro
 
-TARGET_NAME := gamate
+TARGET_NAME := gam8
 SPACE :=
 SPACE := $(SPACE) $(SPACE)
 BACKSLASH :=
@@ -754,8 +755,11 @@ $(LIBRARY_NAME)_CFLAGS += $(CFLAGS) $(COMMON_FLAGS)
 ${LIBRARY_NAME}_FILES = $(SOURCES_C)
 include $(THEOS_MAKE_PATH)/library.mk
 else
+DISTDIR ?= dist/$(platform)
+TARGET := $(DISTDIR)/$(TARGET)
 all: $(TARGET)
 $(TARGET): $(OBJECTS)
+	@mkdir -p "$(DISTDIR)"
 ifeq ($(STATIC_LINKING), 1)
 	$(AR) rcs $@ $(OBJECTS)
 else
@@ -769,11 +773,15 @@ $(OBJDIR)/%.o: src/%.c src/machine.h src/state.inc src/boards.inc src/cpu_alu.in
 clean:
 	rm -f $(TARGET) $(OBJECTS)
 
-install:
-	install -D -m 755 $(TARGET) $(DESTDIR)$(libdir)/$(LIBRETRO_INSTALL_DIR)/$(TARGET)
+install: $(TARGET)
+	install -D -m 755 $(TARGET) $(DESTDIR)$(libdir)/$(LIBRETRO_INSTALL_DIR)/$(notdir $(TARGET))
+	install -D -m 644 LICENSE "$(DESTDIR)$(licensedir)/LICENSE"
+	install -D -m 644 NOTICE "$(DESTDIR)$(licensedir)/NOTICE"
+	install -D -m 644 third_party/MAME-BSD.txt "$(DESTDIR)$(licensedir)/third_party/MAME-BSD.txt"
 
 uninstall:
-	rm $(DESTDIR)$(libdir)/$(LIBRETRO_INSTALL_DIR)/$(TARGET)
+	rm $(DESTDIR)$(libdir)/$(LIBRETRO_INSTALL_DIR)/$(notdir $(TARGET))
+	rm -f "$(DESTDIR)$(licensedir)/LICENSE" "$(DESTDIR)$(licensedir)/NOTICE" "$(DESTDIR)$(licensedir)/third_party/MAME-BSD.txt"
 
 .PHONY: clean install uninstall
 endif

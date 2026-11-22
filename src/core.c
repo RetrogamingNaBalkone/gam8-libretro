@@ -19,6 +19,8 @@ static const struct retro_vfs_interface *vfs;
 static machine_t machine;
 static uint8_t *cart, bios[4096], lcd[WIDTH * HEIGHT];
 static uint32_t history[WIDTH * HEIGHT], colors[4], cart_id, bios_id;
+// Version 1 identified the board from the cartridge CRC and size alone.
+static unsigned state_version = 1;
 static uint16_t frame565[WIDTH * HEIGHT];
 static int16_t pcm[1600];
 static unsigned ghost;
@@ -58,6 +60,14 @@ static struct retro_core_option_v2_definition defs[] = {
      NULL,
      {{"auto", "Auto"}, {"umc", "UMC"}, {"bit", "BIT"}, {NULL, NULL}},
      "auto"},
+    {"gamate_mapper",
+     "Cartridge board (restart)",
+     NULL,
+     "Select 4-in-1 for a patched 128 KiB multicart. Known dumps always use their original board.",
+     NULL,
+     NULL,
+     {{"auto", "Auto"}, {"4in1", "4-in-1"}, {NULL, NULL}},
+     "auto"},
     {0}};
 
 void retro_set_environment(retro_environment_t cb)
@@ -74,6 +84,7 @@ void retro_set_environment(retro_environment_t cb)
             {"gamate_palette", "Color palette; mame|pico|gray|game"},
             {"gamate_ghost", "LCD ghosting; off|light|medium|strong"},
             {"gamate_bios", "BIOS (restart); auto|umc|bit"},
+            {"gamate_mapper", "Cartridge board (restart); auto|4in1"},
             {NULL, NULL}};
         env(RETRO_ENVIRONMENT_SET_VARIABLES, vars);
     }
@@ -101,7 +112,7 @@ unsigned retro_api_version(void) { return RETRO_API_VERSION; }
 void retro_get_system_info(struct retro_system_info *info)
 {
     memset(info, 0, sizeof(*info));
-    info->library_name = "Gamate";
+    info->library_name = "Gam8";
     info->library_version = "0.1";
     info->valid_extensions = "bin";
 }
@@ -259,8 +270,10 @@ bool retro_load_game(const struct retro_game_info *game)
                                                       BUTTON(SELECT, "Select"),
                                                       {0}};
     const char *system = NULL;
-    if (cart || !game || !game->data || !game->size || game->size > 0x400000)
+    if (cart || !game || !game->data)
         return error_message("Invalid Gamate cartridge.");
+    if (!machine_cart_size_supported(game->size))
+        return error_message("Unsupported Gamate ROM size. Expected 16, 32, 64, 128, 256 or 512 KiB.");
     if (!env(RETRO_ENVIRONMENT_GET_SYSTEM_DIRECTORY, &system) || !system)
         return error_message("Set the frontend system directory for the Gamate BIOS.");
     const char *mode = option("gamate_bios", "auto");
@@ -280,7 +293,10 @@ bool retro_load_game(const struct retro_game_info *game)
         return error_message("Could not allocate cartridge memory.");
     memcpy(cart, game->data, game->size);
     cart_id = gamate_crc32(cart, game->size);
-    machine_cart(cart, game->size, bios, machine_board(cart_id, game->size));
+    bool use_multicart = !strcmp(option("gamate_mapper", "auto"), "4in1");
+    enum board pcb = machine_board(cart_id, game->size, use_multicart);
+    state_version = use_multicart && pcb != machine_board(cart_id, game->size, false) ? 2 : 1;
+    machine_cart(cart, game->size, bios, pcb);
     machine_power(&machine);
     valid_history = false;
     preset_path(system, game->path);
@@ -308,6 +324,13 @@ void retro_deinit(void)
     vfs = NULL;
     logger = NULL;
 }
+static unsigned blend_channel(uint8_t target, uint8_t prev, unsigned weight)
+{
+    unsigned mixed = (target * (4 - weight) + prev * weight) >> 2;
+    /* Finish the fade if integer rounding would retain the old value forever. */
+    return mixed == prev ? target : mixed;
+}
+
 void retro_run(void)
 {
     static const unsigned ids[] = {RETRO_DEVICE_ID_JOYPAD_UP,    RETRO_DEVICE_ID_JOYPAD_DOWN,
@@ -327,11 +350,11 @@ void retro_run(void)
     size_t samples = machine_frame(&machine, lcd, pcm);
     for (size_t i = 0; i < WIDTH * HEIGHT; ++i) {
         uint32_t c = colors[lcd[i]];
-        if (ghost && valid_history) {
+        if (ghost && valid_history && c != history[i]) {
             uint32_t prev = history[i];
-            unsigned rb = ((c & 0xff00ff) * (4 - ghost) + (prev & 0xff00ff) * ghost) >> 2;
-            unsigned g = ((c & 0xff00) * (4 - ghost) + (prev & 0xff00) * ghost) >> 2;
-            c = (rb & 0xff00ff) | (g & 0xff00);
+            c = (blend_channel(c >> 16, prev >> 16, ghost) << 16) |
+                (blend_channel(c >> 8, prev >> 8, ghost) << 8) |
+                blend_channel(c, prev, ghost);
         }
         history[i] = c;
         if (rgb565)

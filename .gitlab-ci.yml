@@ -1,7 +1,9 @@
 stages: [build-prepare, build-shared, build-static]
 
 variables:
-  CORENAME: gamate
+  CORENAME: gam8
+  # The pinned templates collect Make outputs from their disposable checkout root.
+  DISTDIR: "."
   MAKEFILE_PATH: .
   JNI_PATH: .
 
@@ -44,125 +46,164 @@ include:
       - /windows-x64-msvc10-msys2.yml
       - /windows-x64-msvc19-msys2.yml
 
+device-and-presentation-tests:
+  stage: build-prepare
+  image: debian:bookworm-slim
+  before_script:
+    - apt-get update
+    - apt-get install -y --no-install-recommends cmake gcc libc6-dev make
+  script:
+    - cmake -S . -B build/tests -DGAM8_TESTS=ON -DCMAKE_BUILD_TYPE=Release
+    - cmake --build build/tests --parallel
+    - ctest --test-dir build/tests --output-on-failure --no-tests=error
+
+# The pinned templates put their distributable binaries at the repository root.
+.gam8-package:
+  artifacts:
+    paths:
+      - ${CORENAME}_libretro*
+      - LICENSE
+      - NOTICE
+      - third_party/MAME-BSD.txt
+    exclude:
+      - "*.a"
+      - "*.bc"
+      - "*.exp"
+      - "*.info"
+      - "*.lib"
+      - "*.pdb"
+
+# Static jobs use a DAG to fetch the matching frontend from RetroArch.
+# Include our test job in that DAG as well as the upstream artifact dependency.
+.gam8-static-package:
+  extends: .gam8-package
+  needs:
+    - job: device-and-presentation-tests
+      artifacts: false
+    - project: libretro/RetroArch
+      job: ${STATIC_RETROARCH_JOB_NAME}
+      ref: ${STATIC_RETROARCH_BRANCH}
+      artifacts: true
+
 android-jni-armeabi-v7a:
-  extends: .libretro-android-jni-armeabi-v7a
+  extends: [.libretro-android-jni-armeabi-v7a, .gam8-package]
 
 android-jni-arm64-v8a:
-  extends: .libretro-android-jni-arm64-v8a
+  extends: [.libretro-android-jni-arm64-v8a, .gam8-package]
 
 android-jni-x86:
-  extends: .libretro-android-jni-x86
+  extends: [.libretro-android-jni-x86, .gam8-package]
 
 android-jni-x86_64:
-  extends: .libretro-android-jni-x86_64
+  extends: [.libretro-android-jni-x86_64, .gam8-package]
 
 ctr-legacy-static-retroarch-master:
-  extends: .libretro-ctr-legacy-static-retroarch-master
+  extends: [.libretro-ctr-legacy-static-retroarch-master, .gam8-static-package]
 
 ctr-static-retroarch-master:
-  extends: .libretro-ctr-static-retroarch-master
+  extends: [.libretro-ctr-static-retroarch-master, .gam8-static-package]
 
 miyoo-arm32-make-default:
-  extends: .libretro-miyoo-arm32-make-default
+  extends: [.libretro-miyoo-arm32-make-default, .gam8-package]
 
 dingux-mips32-make-default:
-  extends: .libretro-dingux-mips32-make-default
+  extends: [.libretro-dingux-mips32-make-default, .gam8-package]
 
 dingux-odbeta-mips32-make-default:
-  extends: .libretro-dingux-odbeta-mips32-make-default
+  extends: [.libretro-dingux-odbeta-mips32-make-default, .gam8-package]
 
 rs90-odbeta-mips32-make-default:
-  extends: .libretro-rs90-odbeta-mips32-make-default
+  extends: [.libretro-rs90-odbeta-mips32-make-default, .gam8-package]
 
 retrofw-mips32-make-default:
-  extends: .libretro-retrofw-mips32-make-default
+  extends: [.libretro-retrofw-mips32-make-default, .gam8-package]
 
 djgpp-static-retroarch-master:
-  extends: .libretro-djgpp-static-retroarch-master
+  extends: [.libretro-djgpp-static-retroarch-master, .gam8-static-package]
 
 emscripten-static-retroarch-master:
-  extends: .libretro-emscripten-static-retroarch-master
+  extends: [.libretro-emscripten-static-retroarch-master, .gam8-static-package]
 
 ios-arm64-make-default:
-  extends: .libretro-ios-arm64-make-default
+  extends: [.libretro-ios-arm64-make-default, .gam8-package]
 
 ios9-make-default:
-  extends: .libretro-ios9-make-default
+  extends: [.libretro-ios9-make-default, .gam8-package]
 
 libnx-static-retroarch-master:
-  extends: .libretro-libnx-static-retroarch-master
+  extends: [.libretro-libnx-static-retroarch-master, .gam8-static-package]
 
 libounce-static-retroarch-master:
-  extends: .libretro-libounce-static-retroarch-master
+  extends: [.libretro-libounce-static-retroarch-master, .gam8-static-package]
 
 linux-aarch64-make-default:
-  extends: .libretro-linux-aarch64-make-default
+  extends: [.libretro-linux-aarch64-make-default, .gam8-package]
 
 linux-i686-make-default:
-  extends: .libretro-linux-i686-make-default
+  extends: [.libretro-linux-i686-make-default, .gam8-package]
 
 linux-x64-make-default:
-  extends: .libretro-linux-x64-make-default
+  extends: [.libretro-linux-x64-make-default, .gam8-package]
 
 ngc-static-retroarch-master:
-  extends: .libretro-ngc-static-retroarch-master
+  extends: [.libretro-ngc-static-retroarch-master, .gam8-static-package]
 
 orbis-static-retroarch-master:
-  extends: .libretro-orbis-static-retroarch-master
+  extends: [.libretro-orbis-static-retroarch-master, .gam8-static-package]
 
 osx-arm64-make-default:
-  extends: .libretro-osx-arm64-make-default
+  extends: [.libretro-osx-arm64-make-default, .gam8-package]
 
 osx-ppc-make-default:
-  extends: .libretro-osx-ppc-make-default
+  extends: [.libretro-osx-ppc-make-default, .gam8-package]
 
 osx-x64-make-default:
-  extends: .libretro-osx-x64-make-default
+  extends: [.libretro-osx-x64-make-default, .gam8-package]
 
 ps2-static-retroarch-master:
-  extends: .libretro-ps2-static-retroarch-master
+  extends: [.libretro-ps2-static-retroarch-master, .gam8-static-package]
 
 psl1ght-static-retroarch-master:
-  extends: .libretro-psl1ght-static-retroarch-master
+  extends: [.libretro-psl1ght-static-retroarch-master, .gam8-static-package]
 
 psp-static-retroarch-master:
-  extends: .libretro-psp-static-retroarch-master
+  extends: [.libretro-psp-static-retroarch-master, .gam8-static-package]
 
 tvos-arm64-make-default:
-  extends: .libretro-tvos-arm64-make-default
+  extends: [.libretro-tvos-arm64-make-default, .gam8-package]
 
 vita-static-retroarch-master:
-  extends: .libretro-vita-static-retroarch-master
+  extends: [.libretro-vita-static-retroarch-master, .gam8-static-package]
 
 webos-armv7a-make-default:
-  extends: .libretro-webos-armv7a-make-default
+  extends: [.libretro-webos-armv7a-make-default, .gam8-package]
 
 webos-aarch64-make-default:
-  extends: .libretro-webos-aarch64-make-default
+  extends: [.libretro-webos-aarch64-make-default, .gam8-package]
 
 wii-static-retroarch-master:
-  extends: .libretro-wii-static-retroarch-master
+  extends: [.libretro-wii-static-retroarch-master, .gam8-static-package]
 
 wiiu-static-retroarch-master:
-  extends: .libretro-wiiu-static-retroarch-master
+  extends: [.libretro-wiiu-static-retroarch-master, .gam8-static-package]
 
 windows-i686-mingw-make-default:
-  extends: .libretro-windows-i686-mingw-make-default
+  extends: [.libretro-windows-i686-mingw-make-default, .gam8-package]
 
 windows-i686-msvc05-msys2-make-default:
-  extends: .libretro-windows-i686-msvc05-msys2-make-default
+  extends: [.libretro-windows-i686-msvc05-msys2-make-default, .gam8-package]
 
 windows-i686-msvc10-msys2-make-default:
-  extends: .libretro-windows-i686-msvc10-msys2-make-default
+  extends: [.libretro-windows-i686-msvc10-msys2-make-default, .gam8-package]
 
 windows-i686-msvc19-msys2-make-default:
-  extends: .libretro-windows-i686-msvc19-msys2-make-default
+  extends: [.libretro-windows-i686-msvc19-msys2-make-default, .gam8-package]
 
 windows-x64-mingw-make-default:
-  extends: .libretro-windows-x64-mingw-make-default
+  extends: [.libretro-windows-x64-mingw-make-default, .gam8-package]
 
 windows-x64-msvc10-msys2-make-default:
-  extends: .libretro-windows-x64-msvc10-msys2-make-default
+  extends: [.libretro-windows-x64-msvc10-msys2-make-default, .gam8-package]
 
 windows-x64-msvc19-msys2-make-default:
-  extends: .libretro-windows-x64-msvc19-msys2-make-default
+  extends: [.libretro-windows-x64-msvc19-msys2-make-default, .gam8-package]

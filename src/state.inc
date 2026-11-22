@@ -110,7 +110,7 @@ bool retro_serialize(void *data, size_t size)
         return false;
     stream_t s = {(uint8_t *)data, NULL, 0};
     scalar(&s, 0x31534d47, 4);
-    scalar(&s, 1, 4);
+    scalar(&s, state_version, 4);
     scalar(&s, cart_id, 4);
     scalar(&s, bios_id, 4);
     scalar(&s, 0, 4);
@@ -143,7 +143,7 @@ bool retro_unserialize(const void *data, size_t size)
     if (!cart || !data || size < needed)
         return false;
     stream_t s = {NULL, (const uint8_t *)data, 0};
-    if (scalar(&s, 0, 4) != 0x31534d47 || scalar(&s, 0, 4) != 1 || scalar(&s, 0, 4) != cart_id ||
+    if (scalar(&s, 0, 4) != 0x31534d47 || scalar(&s, 0, 4) != state_version || scalar(&s, 0, 4) != cart_id ||
         scalar(&s, 0, 4) != bios_id ||
         scalar(&s, 0, 4) != gamate_crc32(s.in + STATE_HEADER, needed - STATE_HEADER))
         return false;

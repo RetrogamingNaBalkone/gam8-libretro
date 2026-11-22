@@ -11,6 +11,7 @@
         }                                                                                          \
     } while (0)
 static const char *system_dir, *bios, *palette = "mame", *ghost = "off";
+static const char *mapper = "auto";
 static FILE *capture, *wave;
 FILE *psg_trace;
 static unsigned frame, limit, test_mode;
@@ -43,9 +44,16 @@ static bool environment(unsigned cmd, void *data)
         return true;
     case RETRO_ENVIRONMENT_GET_VARIABLE: {
         struct retro_variable *v = (struct retro_variable *)data;
-        v->value = !strcmp(v->key, "gamate_bios")    ? bios
-                   : !strcmp(v->key, "gamate_ghost") ? ghost
-                                                     : palette;
+        if (!strcmp(v->key, "gamate_bios"))
+            v->value = bios;
+        else if (!strcmp(v->key, "gamate_ghost"))
+            v->value = ghost;
+        else if (!strcmp(v->key, "gamate_palette"))
+            v->value = palette;
+        else if (!strcmp(v->key, "gamate_mapper"))
+            v->value = mapper;
+        else
+            return false;
         return true;
     }
     case RETRO_ENVIRONMENT_GET_VARIABLE_UPDATE:
@@ -100,6 +108,28 @@ static void state_test(void)
     CHECK(!retro_unserialize(state, size));
     free(state);
 }
+static void cartridge_test(void)
+{
+    static uint8_t image[131072];
+    struct retro_game_info game = {"patched.bin", image, sizeof(image) - 1, NULL};
+    CHECK(!retro_load_game(&game));
+    game.size = sizeof(image);
+    CHECK(retro_load_game(&game));
+    size_t size = retro_serialize_size();
+    uint8_t *state = (uint8_t *)malloc(size);
+    CHECK(state && retro_serialize(state, size));
+    CHECK(state[4] == 1);
+    retro_unload_game();
+    mapper = "4in1";
+    CHECK(retro_load_game(&game) && !retro_unserialize(state, size));
+    CHECK(retro_serialize(state, size) && retro_unserialize(state, size));
+    retro_unload_game();
+    mapper = "auto";
+    CHECK(retro_load_game(&game) && !retro_unserialize(state, size));
+    free(state);
+    retro_unload_game();
+}
+
 int main(int argc, char **argv)
 {
     if (argc != 7) {
@@ -175,6 +205,8 @@ int main(int argc, char **argv)
         retro_run();
     }
     retro_unload_game();
+    if (test_mode)
+        cartridge_test();
     retro_deinit();
     free(rom);
     return 0;

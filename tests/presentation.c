@@ -100,6 +100,22 @@ int main(void)
     CHECK(retro_unserialize(state, size));
     retro_run();
     CHECK(first == 0xbfbfbf);
+    const char *strengths[] = {"light", "medium", "strong"};
+    for (unsigned i = 0; i < 3; ++i) {
+        strength = strengths[i];
+        dirty = true;
+        memset(machine.vram, 0, sizeof(machine.vram));
+        for (unsigned frame = 0; frame < 32; ++frame)
+            retro_run();
+        CHECK(first == 0);
+        for (unsigned j = 0; j < 16384; j += 2)
+            machine.vram[j] = 255;
+        retro_run();
+        CHECK(first > 0 && first < 0xffffff);
+        for (unsigned frame = 1; frame < 32; ++frame)
+            retro_run();
+        CHECK(first == 0xffffff);
+    }
     strength = "off";
     dirty = true;
     rgb565 = true;

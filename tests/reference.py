@@ -38,7 +38,8 @@ def main():
                                 env=dict(os.environ,GAMATE_CAPTURE=str(raw),GAMATE_PSG=str(target/"mame-psg.txt"),GAMATE_FRAMES=str(frames)))
         (target/"run.log").write_bytes(result.stdout+result.stderr)
         if result.returncode or not raw.exists() or raw.stat().st_size != count*96000:
-            raise RuntimeError(f"Capture failed for {bios} {name}, see {target}/run.log")
+            raise RuntimeError(f"Capture failed for {bios} {name}: "
+                               + (result.stdout + result.stderr)[-2500:].decode(errors="replace"))
     with ThreadPoolExecutor(max_workers=args.jobs) as pool:
         list(pool.map(run, ((g,b) for g in games if args.game in (None,g["shortname"])
                              for b in ("umc","bit"))))

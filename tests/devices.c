@@ -15,6 +15,19 @@ int main(void)
     static uint8_t firmware_image[4096], image[65536], pixels[WIDTH * HEIGHT];
     static int16_t samples[1600];
     static machine_t m;
+    for (size_t size = 16384; size <= 524288; size *= 2) {
+        CHECK(machine_cart_size_supported(size));
+        CHECK(!machine_cart_size_supported(size - 1));
+        CHECK(!machine_cart_size_supported(size + 1));
+    }
+    CHECK(!machine_cart_size_supported(0) && !machine_cart_size_supported(8192) &&
+          !machine_cart_size_supported(1048576));
+    CHECK(machine_board(0x10e81571, 131072, false) == MULTI);
+    CHECK(machine_board(0x1c2921df, 131072, true) == BANKED);
+    CHECK(machine_board(0, 131072, false) == BANKED);
+    CHECK(machine_board(0, 131072, true) == MULTI);
+    CHECK(machine_board(0, 32768, true) == PLAIN);
+    CHECK(machine_board(0, 65536, true) == BANKED);
     /* LDA #$42; STA $1c00; INC $00; JMP $e007 */
     const uint8_t program[] = {0xa9, 0x42, 0x8d, 0, 0x1c, 0xe6, 0, 0x4c, 7, 0xe0};
     memcpy(firmware_image, program, sizeof(program));

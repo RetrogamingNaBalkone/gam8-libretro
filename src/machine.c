@@ -30,7 +30,12 @@ uint32_t gamate_crc32(const void *bytes, size_t size)
     return ~crc;
 }
 
-enum board machine_board(uint32_t crc, size_t size)
+bool machine_cart_size_supported(size_t size)
+{
+    return size >= 0x4000 && size <= 0x80000 && (size & (size - 1)) == 0;
+}
+
+enum board machine_board(uint32_t crc, size_t size, bool use_multicart)
 {
     static const struct {
         uint32_t crc, size;
@@ -41,15 +46,9 @@ enum board machine_board(uint32_t crc, size_t size)
     for (size_t i = 0; i < sizeof(records) / sizeof(records[0]); ++i)
         if (records[i].crc == crc && records[i].size == size)
             return records[i].type;
-    switch (size) {
-    case 0x10000:
-    case 0x20000:
-    case 0x40000:
-    case 0x80000:
-        return BANKED;
-    default:
-        return PLAIN;
-    }
+    if (size == 0x20000 && use_multicart)
+        return MULTI;
+    return size <= 0x8000 ? PLAIN : BANKED;
 }
 
 void machine_cart(const uint8_t *data, size_t size, const uint8_t *bios, enum board pcb)
