@@ -2,7 +2,9 @@
 
 The local build targets the libretro ABI and uses software video and audio. A dynamic frontend loads the library directly. On static platforms the build produces an archive to link with the matching RetroArch frontend. The jobs in [the GitLab configuration](../.gitlab-ci.yml) use the [pinned libretro build templates](revisions.txt). The pipeline runs the device and presentation tests before building distribution artifacts. Both tests use synthetic inputs. The results below come from local builds. Upstream buildbot execution and installation via Core Downloader remain unverified.
 
-In the table, a Make platform name means `make platform=NAME` in the corresponding SDK environment. For host-independent desktop cross-builds run `python tests/cross_build.py /path/to/zig dist` (tested with Zig 0.14.1). Local builds use `build/` for working files and `dist/<target>/` for deliverables.
+Use [`tools/build_release.py`](../tools/build_release.py) for every local release rebuild. It packages Windows x86 and x64, Linux x86, x64, ARMv7 hard-float and ARM64, plus all four Android ABIs. Linux builds target glibc 2.17. The ARMv7 package uses an ARMv6 + VFPv2 instruction baseline for compatibility with ARMv7 handhelds. Android builds use API 21 and enable flexible page sizes with NDK r27d. Local builds use `build/` for working files and `dist/<target>/` for deliverables, with Android packages in `dist/android/<abi>/`.
+
+In the table, a Make platform name means `make platform=NAME` in the corresponding SDK environment. The table also records earlier verification for other targets.
 
 | Target | Build entry point / SDK | Verified result |
 |---|---|---|

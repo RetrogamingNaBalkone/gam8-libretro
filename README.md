@@ -44,7 +44,15 @@ Install the `gam8_libretro` library and its matching info file, then select Gam8
 
 Use `build/` for build trees and test workspaces. Publish finished files under `dist/<target>/`. See the [project layout and cleanup rules](AGENTS.md).
 
-From a clean checkout with a C compiler and CMake:
+For a release rebuild, install Python 3, Zig and the Android NDK outside the checkout, then run:
+
+```sh
+python tools/build_release.py
+```
+
+Use `py` in place of `python` if your Windows installation uses the Python launcher. Put `zig` and `ndk-build` on `PATH` or pass their paths with `--zig` and `--ndk-build`. One run builds Windows x86/x64, Linux x86/x64/ARMv7 hard-float/ARM64 and Android armeabi-v7a/arm64-v8a/x86/x86_64. It publishes the whole matrix after all builds succeed. Every target directory includes the core info file and licenses.
+
+For a native development build with a C compiler and CMake:
 
 ```sh
 cmake -S . -B build/native -DCMAKE_BUILD_TYPE=Release
