@@ -4,7 +4,7 @@ A standalone software-rendered Bit Corporation Gamate emulator for RetroArch. Th
 
 ## Start a game
 
-1. Copy the library for your platform into RetroArch's **Cores** directory and [`gam8_libretro.info`](info/gam8_libretro.info) into its **Core Info** directory. Alternatively, use **Load Core → Install or Restore a Core**.
+1. Choose the release folder for your RetroArch platform and architecture. Copy its contents into the RetroArch folder, merging `cores/`, `info/` and `licenses/`. If your installation uses different paths, check **Settings → Directory** for the Cores and Core Info locations. For a protected cores directory, use **Load Core → Install or Restore a Core** to install the library.
 2. Extract at least one of the following 4096-byte BIOS files into RetroArch's **System/BIOS** directory. Rename the extracted file as shown.
 3. Select **Load Core → Bit Corporation - Gamate (Gam8)**, then **Load Content** and select a cartridge `.bin` or its single-game ZIP. RetroArch handles archive extraction. Supported ROM sizes are 16, 32, 64, 128, 256 and 512 KiB.
 
@@ -50,7 +50,7 @@ For a release rebuild, install Python 3, Zig and the Android NDK outside the che
 python tools/build_release.py
 ```
 
-Use `py` in place of `python` if your Windows installation uses the Python launcher. Put `zig` and `ndk-build` on `PATH` or pass their paths with `--zig` and `--ndk-build`. One run builds Windows x86/x64, Linux x86/x64/ARMv7 hard-float/ARM64 and Android armeabi-v7a/arm64-v8a/x86/x86_64. It publishes the whole matrix after all builds succeed. Every target directory includes the core info file and licenses.
+Use `py` in place of `python` if your Windows installation uses the Python launcher. Put `zig` and `ndk-build` on `PATH` or pass their paths with `--zig` and `--ndk-build`. One run builds Windows x86/x64, Linux x86/x64/ARMv7 hard-float/ARM64 and Android armeabi-v7a/arm64-v8a/x86/x86_64. It publishes the whole matrix after all builds succeed. To repackage the existing binaries, run `python tools/build_release.py --repack`.
 
 For a native development build with a C compiler and CMake:
 
